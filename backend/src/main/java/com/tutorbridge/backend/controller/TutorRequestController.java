@@ -19,15 +19,47 @@ public class TutorRequestController {
         this.service = service;
     }
 
-    // Submit a tutor request
+    // ✅ User: submit tutor request
     @PostMapping
-    public ResponseEntity<?> submitRequest(@Valid @RequestBody TutorRequest request) {
+    public ResponseEntity<TutorRequest> submitRequest(
+            @Valid @RequestBody TutorRequest request) {
         return ResponseEntity.ok(service.saveRequest(request));
     }
 
-    // Get all tutor requests
+    // ✅ Admin: get all requests
     @GetMapping
     public ResponseEntity<List<TutorRequest>> getAllRequests() {
         return ResponseEntity.ok(service.getAllRequests());
     }
+
+    // ✅ User: my requests
+    @GetMapping("/my-requests")
+    public ResponseEntity<List<TutorRequest>> getMyRequests(
+            @RequestParam String phone) {
+        return ResponseEntity.ok(service.getRequestsByPhone(phone));
+    }
+
+    // ✅ ADMIN: ASSIGN TEACHER (THIS WAS MISSING ❌)
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<TutorRequest> assignTeacher(
+            @PathVariable Long id,
+            @RequestParam String teacherName
+    ) {
+        return ResponseEntity.ok(service.assignTeacher(id, teacherName));
+    }
+
+    // Admin: start tuition
+    @PutMapping("/{id}/start")
+    public ResponseEntity<TutorRequest> startTuition(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(service.startTuition(id));
+    }
+
+    // Admin: complete tuition
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<TutorRequest> completeTuition(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(service.completeTuition(id));
+    }
+    
 }

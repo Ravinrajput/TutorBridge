@@ -24,7 +24,6 @@ export default function Navbar() {
 
         <div className="space-x-6">
           <Link to="/" className="hover:text-blue-600">Home</Link>
-          <Link to="/request-tutor" className="hover:text-blue-600">Request Tutor</Link>
 
           {user ? (
             <>

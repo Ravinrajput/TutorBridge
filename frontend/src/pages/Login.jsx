@@ -43,6 +43,8 @@ const Login = () => {
     }
     try {
       const res = await verifyOtp(phone, otp);
+          localStorage.setItem("userPhone", phone);
+
 
       // ✅ Store logged-in user safely
       localStorage.setItem("user", JSON.stringify(res.data));

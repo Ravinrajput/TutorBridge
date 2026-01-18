@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tutor_requests")
 public class TutorRequest {
@@ -12,19 +14,19 @@ public class TutorRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Parent Name is required")
+    @NotBlank
     private String parentName;
 
-    @NotBlank(message = "Phone is required")
+    @NotBlank
     private String phone;
 
-    @Email(message = "Invalid email")
+    @Email
     private String email;
 
-    @NotBlank(message = "Student Name is required")
+    @NotBlank
     private String studentName;
 
-    @NotBlank(message = "Grade is required")
+    @NotBlank
     private String grade;
 
     private String board;
@@ -35,9 +37,28 @@ public class TutorRequest {
     private String timePreference;
     private String notes;
 
+    // 🔹 ADMIN FIELDS
+    @Column(name = "assigned_teacher")
+    private String assignedTeacher;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     public TutorRequest() {}
 
-    // Getters and Setters
+    // 🔹 AUTO VALUES ON CREATE
+    @PrePersist
+    protected void onCreate() {
+        this.status = RequestStatus.REQUEST_SUBMITTED;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // -------- GETTERS & SETTERS --------
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -76,4 +97,12 @@ public class TutorRequest {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getAssignedTeacher() { return assignedTeacher; }
+    public void setAssignedTeacher(String assignedTeacher) { this.assignedTeacher = assignedTeacher; }
+
+    public RequestStatus getStatus() { return status; }
+    public void setStatus(RequestStatus status) { this.status = status; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
