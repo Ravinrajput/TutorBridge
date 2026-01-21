@@ -2,10 +2,10 @@ package com.tutorbridge.backend.controller;
 
 import com.tutorbridge.backend.model.TutorRequest;
 import com.tutorbridge.backend.service.TutorRequestService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -19,47 +19,36 @@ public class TutorRequestController {
         this.service = service;
     }
 
-    // ✅ User: submit tutor request
     @PostMapping
-    public ResponseEntity<TutorRequest> submitRequest(
-            @Valid @RequestBody TutorRequest request) {
+    public ResponseEntity<TutorRequest> submitRequest(@RequestBody TutorRequest request) {
         return ResponseEntity.ok(service.saveRequest(request));
     }
 
-    // ✅ Admin: get all requests
     @GetMapping
     public ResponseEntity<List<TutorRequest>> getAllRequests() {
         return ResponseEntity.ok(service.getAllRequests());
     }
 
-    // ✅ User: my requests
-    @GetMapping("/my-requests")
-    public ResponseEntity<List<TutorRequest>> getMyRequests(
-            @RequestParam String phone) {
-        return ResponseEntity.ok(service.getRequestsByPhone(phone));
-    }
-
-    // ✅ ADMIN: ASSIGN TEACHER (THIS WAS MISSING ❌)
+    // ✅ ADMIN: Assign Teacher
     @PutMapping("/{id}/assign")
     public ResponseEntity<TutorRequest> assignTeacher(
             @PathVariable Long id,
-            @RequestParam String teacherName
+            @RequestBody Map<String, String> body
     ) {
-        return ResponseEntity.ok(service.assignTeacher(id, teacherName));
+        return ResponseEntity.ok(
+                service.assignTeacher(id, body.get("teacherName"))
+        );
     }
 
-    // Admin: start tuition
+    // ✅ START TUITION
     @PutMapping("/{id}/start")
-    public ResponseEntity<TutorRequest> startTuition(
-            @PathVariable Long id) {
+    public ResponseEntity<TutorRequest> startTuition(@PathVariable Long id) {
         return ResponseEntity.ok(service.startTuition(id));
     }
 
-    // Admin: complete tuition
+    // ✅ COMPLETE TUITION
     @PutMapping("/{id}/complete")
-    public ResponseEntity<TutorRequest> completeTuition(
-            @PathVariable Long id) {
+    public ResponseEntity<TutorRequest> completeTuition(@PathVariable Long id) {
         return ResponseEntity.ok(service.completeTuition(id));
     }
-    
 }

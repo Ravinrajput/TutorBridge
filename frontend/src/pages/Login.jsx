@@ -36,26 +36,27 @@ const Login = () => {
     }
   };
 
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 6) {
-      setMessage("Enter valid OTP");
-      return;
-    }
-    try {
-      const res = await verifyOtp(phone, otp);
-          localStorage.setItem("userPhone", phone);
+const handleVerifyOtp = async () => {
+  if (otp.length !== 6) {
+    setMessage("Enter valid OTP");
+    return;
+  }
 
+  try {
+    const res = await verifyOtp(phone, otp);
 
-      // ✅ Store logged-in user safely
-      localStorage.setItem("user", JSON.stringify(res.data));
+    // ✅ SAVE USER DATA
+    localStorage.setItem("userId", res.data.userId);
+    localStorage.setItem("userPhone", res.data.phone);
+    localStorage.setItem("role", res.data.role); // USER
 
-      setMessage("Login successful 🎉");
+    setMessage("Login successful 🎉");
+    navigate("/"); // ✅ NO refresh
+  } catch (error) {
+    setMessage(error.response?.data?.message || "OTP verification failed");
+  }
+};
 
-      setTimeout(() => navigate("/"), 1000);
-    } catch (error) {
-      setMessage(error.response?.data?.message || "OTP verification failed");
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">

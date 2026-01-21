@@ -3,17 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Navbar() {
   const navigate = useNavigate();
 
-  // Safe parse for localStorage user
-  const user = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
-  })();
+  // ✅ Read from localStorage
+  const userId = localStorage.getItem("userId");
+  const role = localStorage.getItem("role"); // ADMIN / USER
+  const phone = localStorage.getItem("userPhone");
+  const email = localStorage.getItem("userEmail");
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.clear(); // ✅ clears old ADMIN role issue
     navigate("/login");
   };
 
@@ -25,9 +22,19 @@ export default function Navbar() {
         <div className="space-x-6">
           <Link to="/" className="hover:text-blue-600">Home</Link>
 
-          {user ? (
+          {/* ✅ ADMIN ONLY */}
+          {role === "ADMIN" && (
+            <Link to="/admin-dashboard" className="hover:text-blue-600">
+              Admin Dashboard
+            </Link>
+          )}
+
+          {/* ✅ LOGGED IN USER */}
+          {userId ? (
             <>
-              <span className="text-gray-700">Hi, {user.phone}</span>
+              <span className="text-gray-700">
+                Hi, {role === "ADMIN" ? email : phone}
+              </span>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded"

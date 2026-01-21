@@ -1,11 +1,9 @@
- package com.tutorbridge.backend.service;
+package com.tutorbridge.backend.service;
 
 import com.tutorbridge.backend.model.RequestStatus;
 import com.tutorbridge.backend.model.TutorRequest;
 import com.tutorbridge.backend.repository.TutorRequestRepository;
 import org.springframework.stereotype.Service;
-import com.tutorbridge.backend.model.RequestStatus;
-
 
 import java.util.List;
 
@@ -18,44 +16,43 @@ public class TutorRequestService {
         this.repository = repository;
     }
 
-    // Save a new request
+    // Create request
     public TutorRequest saveRequest(TutorRequest request) {
+        request.setStatus(RequestStatus.REQUEST_SUBMITTED);
         return repository.save(request);
     }
 
-    // Get all requests
+    // Get all
     public List<TutorRequest> getAllRequests() {
         return repository.findAll();
     }
 
-    // Assign a teacher to a request
-    public TutorRequest assignTeacher(Long requestId, String teacherName) {
-        TutorRequest request = repository.findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Request not found"));
+    // Assign teacher
+    public TutorRequest assignTeacher(Long id, String teacherName) {
+        TutorRequest request = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
 
         request.setAssignedTeacher(teacherName);
         request.setStatus(RequestStatus.TEACHER_ASSIGNED);
 
         return repository.save(request);
     }
-    public List<TutorRequest> getRequestsByPhone(String phone) {
-    return repository.findByPhone(phone);
-}
 
-public TutorRequest startTuition(Long requestId) {
-    TutorRequest request = repository.findById(requestId)
-        .orElseThrow(() -> new RuntimeException("Request not found"));
-    request.setStatus(RequestStatus.TUITION_STARTED);
-    return repository.save(request);
-}
+    // Start tuition
+    public TutorRequest startTuition(Long id) {
+        TutorRequest request = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
 
-public TutorRequest completeTuition(Long requestId) {
-    TutorRequest request = repository.findById(requestId)
-        .orElseThrow(() -> new RuntimeException("Request not found"));
-    request.setStatus(RequestStatus.COMPLETED);
-    return repository.save(request);
-}
+        request.setStatus(RequestStatus.TUITION_STARTED);
+        return repository.save(request);
+    }
 
+    // Complete tuition
+    public TutorRequest completeTuition(Long id) {
+        TutorRequest request = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
 
-
+        request.setStatus(RequestStatus.COMPLETED);
+        return repository.save(request);
+    }
 }

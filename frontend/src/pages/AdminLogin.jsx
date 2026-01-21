@@ -10,17 +10,17 @@ export default function AdminLogin() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/admin-login", {
-        email,      // send email, not phone
-        password
-      });
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/admin-login",
+        { email, password }
+      );
 
+      // ✅ STORE ADMIN DATA
       localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("role", res.data.role); // ADMIN
       localStorage.setItem("userEmail", email);
 
-      setMessage("Login successful 🎉");
-      setTimeout(() => navigate("/admin-dashboard"), 1000);
+      navigate("/admin-dashboard"); // ✅ instant redirect
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }
@@ -33,7 +33,7 @@ export default function AdminLogin() {
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Admin Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border px-3 py-2 rounded mb-3"
@@ -54,7 +54,7 @@ export default function AdminLogin() {
           Login
         </button>
 
-        {message && <p className="text-center text-sm text-gray-700 mt-4">{message}</p>}
+        {message && <p className="text-center mt-3 text-red-500">{message}</p>}
       </div>
     </div>
   );
