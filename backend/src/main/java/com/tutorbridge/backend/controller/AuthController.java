@@ -74,30 +74,34 @@ public class AuthController {
 
     // 3️⃣ ADMIN LOGIN (email + password)
     @PostMapping("/admin-login")
-    public ResponseEntity<?> adminLogin(@RequestBody Map<String, String> req) {
-        String email = req.get("email");
-        String password = req.get("password");
+public ResponseEntity<?> adminLogin(@RequestBody Map<String, String> req) {
+    String email = req.get("email");
+    String password = req.get("password");
 
-        if (email == null || password == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email and password required"));
-        }
-
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
-
-        if (admin.getRole() != Role.ADMIN) {
-            return ResponseEntity.status(403).body(Map.of("message", "Not authorized"));
-        }
-
-        if (!passwordEncoder.matches(password, admin.getPassword())) {
-            return ResponseEntity.status(401).body(Map.of("message", "Invalid password"));
-        }
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Admin login successful",
-                "userId", admin.getId(),
-                "role", admin.getRole().name(),
-                "email", admin.getEmail()
-        ));
+    if (email == null || password == null) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Email and password required"));
     }
+
+    User admin = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+    if (admin.getRole() != Role.ADMIN) {
+        return ResponseEntity.status(403)
+                .body(Map.of("message", "Not an admin account"));
+    }
+
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    if (!encoder.matches(password, admin.getPassword())) {
+        return ResponseEntity.status(401)
+                .body(Map.of("message", "Invalid password"));
+    }
+
+    return ResponseEntity.ok(Map.of(
+            "message", "Admin login successful",
+            "userId", admin.getId(),
+            "role", admin.getRole().name()
+    ));
+}
+
 }

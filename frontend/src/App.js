@@ -7,7 +7,7 @@ import TutorRequest from "./pages/TutorRequest";
 import MyRequests from "./pages/MyRequests";
 
 function App() {
-  const role = localStorage.getItem("role");
+  const isAdmin = localStorage.getItem("role") === "ADMIN";
 
   return (
     <Router>
@@ -21,7 +21,7 @@ function App() {
         {/* ✅ ADMIN PROTECTED ROUTE */}
         <Route
           path="/admin-dashboard"
-          element={role === "ADMIN" ? <AdminDashboard /> : <Navigate to="/admin-login" />}
+          element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin-login" replace />}
         />
       </Routes>
     </Router>

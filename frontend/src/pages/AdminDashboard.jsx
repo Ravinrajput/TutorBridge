@@ -1,60 +1,156 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [requests, setRequests] = useState([]);
+  const [teacherName, setTeacherName] = useState("");
 
-  const handleLogin = async () => {
+  // 🔐 Protect admin route
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role !== "ADMIN") {
+      navigate("/admin-login");
+    }
+  }, [navigate]);
+
+  // 📥 Fetch tutor requests
+  const fetchRequests = async () => {
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/admin-login", {
-        email,      // send email, not phone
-        password
-      });
-
-      localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("userEmail", email);
-
-      setMessage("Login successful 🎉");
-      setTimeout(() => navigate("/admin-dashboard"), 1000);
+      const res = await axios.get("http://localhost:8080/api/admin/requests");
+      setRequests(res.data);
     } catch (err) {
-      setMessage(err.response?.data?.message || "Login failed");
+      console.error(err);
+      alert("Failed to load tutor requests");
     }
   };
 
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  // 👨‍🏫 Assign teacher
+  const assignTeacher = async (requestId) => {
+    if (!teacherName.trim()) {
+      alert("Enter teacher name");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `http://localhost:8080/api/admin/assign-teacher/${requestId}?teacherName=${teacherName}`
+      );
+      setTeacherName("");
+      fetchRequests();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to assign teacher");
+    }
+  };
+
+  // 🚪 Logout
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/admin-login");
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">
-      <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-center mb-4">Admin Login</h2>
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border px-3 py-2 rounded mb-3"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border px-3 py-2 rounded mb-3"
-        />
-
+    <div className="min-h-screen bg-gray-100 p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center bg-white p-4 rounded shadow">
+        <h1 className="text-2xl font-bold text-blue-600">
+          TutorBridge Admin Dashboard
+        </h1>
         <button
-          onClick={handleLogin}
-          className="w-full bg-blue-600 text-white py-2 rounded"
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
         >
-          Login
+          Logout
         </button>
+      </div>
 
-        {message && <p className="text-center text-sm text-gray-700 mt-4">{message}</p>}
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+          <h2 className="text-lg font-semibold">Total Requests</h2>
+          <p className="text-3xl font-bold mt-2">{requests.length}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+          <h2 className="text-lg font-semibold">Pending Requests</h2>
+          <p className="text-3xl font-bold mt-2">
+            {requests.filter(r => r.status === "SUBMITTED").length}
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+          <h2 className="text-lg font-semibold">Assigned Tutors</h2>
+          <p className="text-3xl font-bold mt-2">
+            {requests.filter(r => r.assignedTeacher).length}
+          </p>
+        </div>
+      </div>
+
+      {/* Tutor Requests Table */}
+      <div className="bg-white p-6 rounded shadow mt-6">
+        <h2 className="text-xl font-semibold mb-4">Tutor Requests</h2>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-300 text-center">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border p-2">ID</th>
+                <th className="border p-2">Parent</th>
+                <th className="border p-2">Student</th>
+                <th className="border p-2">Grade</th>
+                <th className="border p-2">Subjects</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2">Teacher</th>
+                <th className="border p-2">Assign</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {requests.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="p-4">No tutor requests found</td>
+                </tr>
+              ) : (
+                requests.map((req) => (
+                  <tr key={req.id} className="hover:bg-gray-50">
+                    <td className="border p-2">{req.id}</td>
+                    <td className="border p-2">{req.parentName}</td>
+                    <td className="border p-2">{req.studentName}</td>
+                    <td className="border p-2">{req.grade}</td>
+                    <td className="border p-2">{req.subjects}</td>
+                    <td className="border p-2">{req.status}</td>
+                    <td className="border p-2">{req.assignedTeacher || "-"}</td>
+                    <td className="border p-2">
+                      {req.status === "SUBMITTED" && (
+                        <div className="flex gap-2 justify-center">
+                          <input
+                            type="text"
+                            placeholder="Teacher"
+                            value={teacherName}
+                            onChange={(e) => setTeacherName(e.target.value)}
+                            className="border px-2 py-1 rounded w-28"
+                          />
+                          <button
+                            onClick={() => assignTeacher(req.id)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                          >
+                            Assign
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
