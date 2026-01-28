@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API = "http://localhost:8080/api/request-tutor";
+const API_URL = "https://tutorbridge-production.up.railway.app/api/request-tutor";
+
 
 export const assignTeacher = (id, teacherName) =>
   axios.put(`${API}/${id}/assign`, { teacherName });
