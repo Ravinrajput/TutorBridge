@@ -39,8 +39,8 @@ export default function Footer() {
           <p>📧 support@tutorbridge.com</p>
         </div>
         <div>
-          <h3 className="font-semibold text-lg text-blue-800">Deavloper</h3>
-          <p className="mt-3">Devlopped by Ravi Singh</p>
+          <h3 className="font-semibold text-lg text-blue-800">Developer</h3>
+          <p className="mt-3">Developed by Ravi Singh</p>
 
         </div>
       </div>
