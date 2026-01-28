@@ -9,7 +9,7 @@ const MyRequests = () => {
     if (!phone) return;
 
     axios
-      .get(`http://localhost:8080/api/request-tutor/my-requests?phone=${phone}`)
+      .get(`https://tutorbridge-production.up.railway.app/api/request-tutor/my-requests?phone=${phone}`)
       .then((res) => setRequests(res.data))
       .catch(() => alert("Failed to load requests"));
   }, [phone]);
