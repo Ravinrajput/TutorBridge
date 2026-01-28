@@ -38,7 +38,15 @@ export default function Footer() {
           <p className="mt-3">📞 +91 9587147260</p>
           <p>📧 support@tutorbridge.com</p>
         </div>
+        <div>
+          <h3 className="font-semibold text-lg text-blue-800">Deavloper</h3>
+          <p className="mt-3">Devlopped by Ravi Singh</p>
+
+        </div>
       </div>
     </footer>
   );
 }
+ git add .
+git commit -m "Footer updated with developer info"
+git push origin main
