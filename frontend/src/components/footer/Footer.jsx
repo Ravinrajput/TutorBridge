@@ -35,7 +35,7 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <h3 className="font-semibold text-lg text-blue-800">Contact</h3>
-          <p className="mt-3">📞 +91 9587147260</p>
+          <p className="mt-3">📞 +91 95871xxxxx</p>
           <p>📧 support@tutorbridge.com</p>
         </div>
         <div>
@@ -47,6 +47,5 @@ export default function Footer() {
     </footer>
   );
 }
- git add .
-git commit -m "Footer updated with developer info"
-git push origin main
+ 
+
