@@ -19,6 +19,7 @@ public class AuthController {
     private final OtpService otpService;
     private final TwilioSmsService smsService;
     private final UserRepository userRepository;
+    @SuppressWarnings("unused")
     private final BCryptPasswordEncoder passwordEncoder;
 
     public AuthController(
@@ -33,19 +34,32 @@ public class AuthController {
     }
 
     // 1️⃣ SEND OTP
-    @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> req) {
-        String phone = req.get("phone");
+   @PostMapping("/send-otp")
+public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> req) {
+    String phone = req.get("phone");
 
-        if (phone == null || phone.length() != 10) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid phone"));
-        }
-
-        String otp = otpService.generateOtp(phone);
-        smsService.sendOtp(phone, otp);
-
-        return ResponseEntity.ok(Map.of("message", "OTP sent"));
+    if (phone == null || phone.length() != 10) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Invalid phone"));
     }
+
+    // ✅ OTP RATE LIMIT CHECK
+    if (!otpService.canSendOtp(phone)) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Please wait before requesting OTP again"));
+    }
+
+    String otp = otpService.generateOtp(phone);
+
+    try {
+        smsService.sendOtp(phone, otp);
+    } catch (Exception e) {
+        return ResponseEntity.status(500)
+                .body(Map.of("message", "OTP service failed. Try again later"));
+    }
+
+    return ResponseEntity.ok(Map.of("message", "OTP sent"));
+}
 
     // 2️⃣ VERIFY OTP + LOGIN (for normal users)
     @PostMapping("/verify-otp")
