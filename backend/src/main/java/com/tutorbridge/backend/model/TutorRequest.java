@@ -45,7 +45,7 @@ public class TutorRequest {
     @Column(nullable = false)
     private RequestStatus status;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public TutorRequest() {}

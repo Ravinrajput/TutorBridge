@@ -1,37 +1,54 @@
 package com.tutorbridge.backend.controller;
 
+import com.tutorbridge.backend.model.Admin;
 import com.tutorbridge.backend.model.TutorRequest;
+import com.tutorbridge.backend.repository.AdminRepository;
 import com.tutorbridge.backend.service.TutorRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
 public class AdminController {
 
-    private final TutorRequestService service;
+    private final TutorRequestService tutorRequestService;
+    private final AdminRepository adminRepository;
 
-    public AdminController(TutorRequestService service) {
-        this.service = service;
+    public AdminController(TutorRequestService tutorRequestService,
+                           AdminRepository adminRepository) {
+        this.tutorRequestService = tutorRequestService;
+        this.adminRepository = adminRepository;
     }
 
-    // 🔹 Admin: View all tutor requests
+    // View all tutor requests (adminId required)
     @GetMapping("/requests")
-    public ResponseEntity<List<TutorRequest>> getAllRequests() {
-        return ResponseEntity.ok(service.getAllRequests());
+    public ResponseEntity<?> getAllRequests(@RequestParam Long adminId) {
+        Optional<Admin> adminOpt = adminRepository.findById(adminId);
+        if (adminOpt.isEmpty()) {
+            return ResponseEntity.status(403).body("Unauthorized: Admin not found");
+        }
+
+        List<TutorRequest> requests = tutorRequestService.getAllRequests();
+        return ResponseEntity.ok(requests);
     }
 
-    // 🔹 Admin: Assign teacher
+    // Assign teacher (adminId required)
     @PutMapping("/assign-teacher/{requestId}")
-    public ResponseEntity<TutorRequest> assignTeacher(
+    public ResponseEntity<?> assignTeacher(
+            @RequestParam Long adminId,
             @PathVariable Long requestId,
             @RequestParam String teacherName
     ) {
-        return ResponseEntity.ok(
-                service.assignTeacher(requestId, teacherName)
-        );
+        Optional<Admin> adminOpt = adminRepository.findById(adminId);
+        if (adminOpt.isEmpty()) {
+            return ResponseEntity.status(403).body("Unauthorized: Admin not found");
+        }
+
+        TutorRequest updatedRequest = tutorRequestService.assignTeacher(requestId, teacherName);
+        return ResponseEntity.ok(updatedRequest);
     }
 }

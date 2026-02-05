@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [teacherName, setTeacherName] = useState("");
+
+  const adminId = localStorage.getItem("userId");
 
   // 🔐 Protect admin route
   useEffect(() => {
@@ -15,20 +17,26 @@ export default function AdminDashboard() {
     }
   }, [navigate]);
 
-  // 📥 Fetch tutor requests
-  const fetchRequests = async () => {
+  // 📥 Fetch tutor requests (MEMOIZED)
+  const fetchRequests = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/admin/requests");
+      const res = await axios.get(
+        "http://localhost:8080/api/admin/requests",
+        {
+          params: { adminId }
+        }
+      );
       setRequests(res.data);
     } catch (err) {
       console.error(err);
       alert("Failed to load tutor requests");
     }
-  };
+  }, [adminId]);
 
+  // 🔁 Load on mount
   useEffect(() => {
     fetchRequests();
-  }, []);
+  }, [fetchRequests]);
 
   // 👨‍🏫 Assign teacher
   const assignTeacher = async (requestId) => {
@@ -39,7 +47,14 @@ export default function AdminDashboard() {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/admin/assign-teacher/${requestId}?teacherName=${teacherName}`
+        `http://localhost:8080/api/admin/assign-teacher/${requestId}`,
+        null,
+        {
+          params: {
+            teacherName,
+            adminId
+          }
+        }
       );
       setTeacherName("");
       fetchRequests();
@@ -70,21 +85,21 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Stats Section */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+        <div className="bg-white p-6 rounded shadow">
           <h2 className="text-lg font-semibold">Total Requests</h2>
           <p className="text-3xl font-bold mt-2">{requests.length}</p>
         </div>
 
-        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+        <div className="bg-white p-6 rounded shadow">
           <h2 className="text-lg font-semibold">Pending Requests</h2>
           <p className="text-3xl font-bold mt-2">
-            {requests.filter(r => r.status === "SUBMITTED").length}
+            {requests.filter(r => r.status === "REQUEST_SUBMITTED").length}
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+        <div className="bg-white p-6 rounded shadow">
           <h2 className="text-lg font-semibold">Assigned Tutors</h2>
           <p className="text-3xl font-bold mt-2">
             {requests.filter(r => r.assignedTeacher).length}
@@ -114,20 +129,24 @@ export default function AdminDashboard() {
             <tbody>
               {requests.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="p-4">No tutor requests found</td>
+                  <td colSpan="8" className="p-4">
+                    No tutor requests found
+                  </td>
                 </tr>
               ) : (
                 requests.map((req) => (
-                  <tr key={req.id} className="hover:bg-gray-50">
+                  <tr key={req.id}>
                     <td className="border p-2">{req.id}</td>
                     <td className="border p-2">{req.parentName}</td>
                     <td className="border p-2">{req.studentName}</td>
                     <td className="border p-2">{req.grade}</td>
                     <td className="border p-2">{req.subjects}</td>
                     <td className="border p-2">{req.status}</td>
-                    <td className="border p-2">{req.assignedTeacher || "-"}</td>
                     <td className="border p-2">
-                      {req.status === "SUBMITTED" && (
+                      {req.assignedTeacher || "-"}
+                    </td>
+                    <td className="border p-2">
+                      {req.status === "REQUEST_SUBMITTED" && (
                         <div className="flex gap-2 justify-center">
                           <input
                             type="text"
@@ -138,7 +157,7 @@ export default function AdminDashboard() {
                           />
                           <button
                             onClick={() => assignTeacher(req.id)}
-                            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-3 py-1 rounded"
                           >
                             Assign
                           </button>

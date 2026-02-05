@@ -11,17 +11,19 @@ export default function AdminLogin() {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/auth/admin-login",
+        "http://localhost:8080/api/admin/auth/login",
         { email, password }
       );
 
-      localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("role", res.data.role);
+      // ✅ TEMP DATA ONLY
+      localStorage.setItem("adminPhone", res.data.phone);
 
-      setMessage("Admin login successful 🎉");
-      setTimeout(() => navigate("/admin-dashboard"), 1000);
+      setMessage("OTP sent to admin phone 📲");
 
-      
+      setTimeout(() => {
+        navigate("/admin-verify-otp");
+      }, 1000);
+
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }
