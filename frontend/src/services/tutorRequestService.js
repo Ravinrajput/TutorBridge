@@ -1,15 +1,16 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/request-tutor";
+// Base backend URL from environment
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-// Assign a teacher to a request
+// Tutor Request APIs
 export const assignTeacher = (id, teacherName) =>
-  axios.put(`${API_URL}/${id}/assign`, { teacherName });
+  axios.put(`${API_BASE_URL}/api/request-tutor/${id}/assign`, {
+    teacherName,
+  });
 
-// Start a tuition session
 export const startTuition = (id) =>
-  axios.put(`${API_URL}/${id}/start`);
+  axios.put(`${API_BASE_URL}/api/request-tutor/${id}/start`);
 
-// Complete a tuition session
 export const completeTuition = (id) =>
-  axios.put(`${API_URL}/${id}/complete`);
+  axios.put(`${API_BASE_URL}/api/request-tutor/${id}/complete`);
