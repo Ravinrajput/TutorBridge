@@ -19,33 +19,36 @@ export default function TutorRequest() {
   });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("http://localhost:8080/api/request-tutor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+  e.preventDefault();
+  setLoading(true);
 
-      if (res.ok) {
-        alert("Request submitted successfully!");
-        navigate("/");
-      } else {
-        const text = await res.text();
-        console.error("Submit failed:", text);
-        alert("Failed to submit. Try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error. Is backend running?");
-    } finally {
-      setLoading(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/request-tutor`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (res.ok) {
+      alert("Request submitted successfully!");
+      navigate("/");
+    } else {
+      const text = await res.text();
+      console.error("Submit failed:", text);
+      alert("Failed to submit. Try again.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Server error. Backend unreachable.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto p-6 mt-20 bg-white shadow-lg rounded-lg">
