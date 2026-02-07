@@ -1,15 +1,10 @@
+package com.tutorbridge.backend.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -17,13 +12,17 @@ public class CorsConfig {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-            @SuppressWarnings("null")
+
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
+                        .allowedOriginPatterns(
+                                "http://localhost:3000",
+                                "https://tutor-bridge.vercel.app"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
