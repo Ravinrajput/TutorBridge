@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/auth")
-@CrossOrigin(origins = "*")
 public class AdminAuthController {
 
     private final AdminRepository adminRepository;

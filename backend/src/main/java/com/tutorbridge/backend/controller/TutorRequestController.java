@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/request-tutor")
-@CrossOrigin(origins = "*")
 public class TutorRequestController {
 
     private final TutorRequestService service;
