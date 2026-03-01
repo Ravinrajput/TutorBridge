@@ -9,7 +9,7 @@ export default function AdminDashboard() {
   const [teacherNames, setTeacherNames] = useState({});
   const [error, setError] = useState("");
 
-  const adminId = localStorage.getItem("userId");
+  const adminId = Number(localStorage.getItem("userId")) || null;
   const API = process.env.REACT_APP_API_BASE_URL;
 
   // 🔐 Protect admin route
