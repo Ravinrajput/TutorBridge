@@ -9,30 +9,36 @@ export default function AdminVerifyOtp() {
 
   const phone = localStorage.getItem("adminPhone");
 
-  const verifyOtp = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/admin/auth/verify-otp",
-        { phone, otp }
-      );
+ const verifyOtp = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phone, otp: otp.trim() }),
+      }
+    );
 
-      // ✅ FINAL LOGIN DATA
-      localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("role", "ADMIN");
+    const data = await res.json();
 
-      // 🔥 Remove temp data
-      localStorage.removeItem("adminPhone");
+    if (!res.ok) throw new Error(data.message);
 
-      setMessage("Login successful 🎉");
+    localStorage.setItem("userId", data.userId);
+    localStorage.setItem("role", "ADMIN");
+    localStorage.removeItem("adminPhone");
 
-      setTimeout(() => {
-        navigate("/admin-dashboard");
-      }, 800);
+    setMessage("Login successful 🎉");
 
-    } catch (err) {
-      setMessage("Invalid or expired OTP ❌");
-    }
-  };
+    setTimeout(() => navigate("/admin-dashboard"), 800);
+
+  } catch (err) {
+    console.error(err);
+    setMessage("Invalid or expired OTP ❌");
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
