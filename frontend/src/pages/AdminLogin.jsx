@@ -9,25 +9,25 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/admin/auth/login",
-        { email, password }
-      );
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_BASE_URL}/api/admin/auth/login`,
+      { email, password }
+    );
 
-      // ✅ TEMP DATA ONLY
-      localStorage.setItem("adminPhone", res.data.phone);
+    localStorage.setItem("adminPhone", res.data.phone);
 
-      setMessage("OTP sent to admin phone 📲");
+    setMessage("OTP sent to admin phone 📲");
 
-      setTimeout(() => {
-        navigate("/admin-verify-otp");
-      }, 1000);
+    setTimeout(() => {
+      navigate("/admin-verify-otp");
+    }, 1000);
 
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Login failed");
-    }
-  };
+  } catch (err) {
+    setMessage(err.response?.data?.message || "Login failed");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">
