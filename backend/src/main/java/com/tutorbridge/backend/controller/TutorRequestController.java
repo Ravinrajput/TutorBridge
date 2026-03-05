@@ -50,4 +50,10 @@ public class TutorRequestController {
     public ResponseEntity<TutorRequest> completeTuition(@PathVariable Long id) {
         return ResponseEntity.ok(service.completeTuition(id));
     }
+
+    // ✅ USER: Get requests by phone (My Requests page)
+   @GetMapping("/my-requests")
+   public ResponseEntity<List<TutorRequest>> getMyRequests(@RequestParam String phone) {
+   return ResponseEntity.ok(service.getRequestsByPhone(phone));
+}
 }

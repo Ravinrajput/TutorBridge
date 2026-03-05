@@ -34,6 +34,9 @@ export default function Navbar() {
             <>
               <span className="text-gray-700">
                 Hi, {role === "ADMIN" ? email : phone}
+              </span >
+              <span>
+                <Link to="/my-requests" className="hover:text-blue-600">My Requests</Link>
               </span>
               <button
                 onClick={handleLogout}
@@ -47,7 +50,7 @@ export default function Navbar() {
               <Link to="/login" className="hover:text-blue-600">Login</Link>
               <Link to="/signup" className="hover:text-blue-600">Signup</Link>
             </>
-          )}
+              )}
         </div>
       </div>
     </nav>

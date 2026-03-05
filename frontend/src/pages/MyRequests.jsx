@@ -3,48 +3,75 @@ import axios from "axios";
 
 const MyRequests = () => {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const phone = localStorage.getItem("userPhone"); // saved after OTP login
+  const API = process.env.REACT_APP_API_BASE_URL; // use env variable
 
   useEffect(() => {
-    if (!phone) return;
+    if (!phone) {
+      setError("No phone number found. Please login.");
+      setLoading(false);
+      return;
+    }
 
-    axios
-      .get(`https://tutorbridge-production.up.railway.app/api/request-tutor/my-requests?phone=${phone}`)
-      .then((res) => setRequests(res.data))
-      .catch(() => alert("Failed to load requests"));
-  }, [phone]);
+    const fetchRequests = async () => {
+      try {
+        const res = await axios.get(`${API}/api/request-tutor/my-requests`, {
+          params: { phone }
+        });
+        setRequests(res.data);
+        setError("");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load requests");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, [phone, API]);
+
+  if (loading) return <p className="p-6 text-center">Loading requests...</p>;
+  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>My Tutor Requests</h2>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">My Tutor Requests</h2>
 
       {requests.length === 0 ? (
         <p>No requests found</p>
       ) : (
-        <table border="1" cellPadding="10" width="100%">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Student</th>
-              <th>Subjects</th>
-              <th>Status</th>
-              <th>Teacher</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((r) => (
-              <tr key={r.id}>
-                <td>{r.id}</td>
-                <td>{r.studentName}</td>
-                <td>{r.subjects}</td>
-                <td>{r.status}</td>
-                <td>{r.assignedTeacher || "-"}</td>
-                <td>{r.createdAt?.replace("T", " ")}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-300 text-center">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border p-2">ID</th>
+                <th className="border p-2">Student</th>
+                <th className="border p-2">Subjects</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2">Teacher</th>
+                <th className="border p-2">Created At</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {requests.map((r) => (
+                <tr key={r.id}>
+                  <td className="border p-2">{r.id}</td>
+                  <td className="border p-2">{r.studentName}</td>
+                  <td className="border p-2">{r.subjects}</td>
+                  <td className="border p-2">{r.status}</td>
+                  <td className="border p-2">{r.assignedTeacher || "-"}</td>
+                  <td className="border p-2">
+                    {r.createdAt ? r.createdAt.replace("T", " ") : "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

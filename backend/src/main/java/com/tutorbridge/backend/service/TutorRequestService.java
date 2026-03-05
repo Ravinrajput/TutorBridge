@@ -55,4 +55,8 @@ public class TutorRequestService {
         request.setStatus(RequestStatus.COMPLETED);
         return repository.save(request);
     }
+    // Get requests by phone
+    public List<TutorRequest> getRequestsByPhone(String phone) {
+    return repository.findByPhone(phone);
+}
 }
